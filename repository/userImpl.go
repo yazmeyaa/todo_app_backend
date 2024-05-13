@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/yazmeyaa/todo_app_backend/models"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -51,10 +52,16 @@ func (repository UserRepositoryImpl) Create(user *models.User) error {
 		return errors.New("user with given username or email already exist")
 	}
 
+	BCRYPT_COST := 6
+	hash, hashErr := bcrypt.GenerateFromPassword([]byte(user.Password), BCRYPT_COST)
+	if hashErr != nil {
+		return errors.New("falied to hash password")
+	}
+
 	newUser := models.User{
 		Name:     user.Name,
 		Username: user.Username,
-		Password: user.Password,
+		Password: string(hash),
 		Email:    user.Email,
 	}
 	query := repository.DB.Model(&models.User{})

@@ -2,9 +2,13 @@ package services
 
 import (
 	"errors"
+	"log"
 
 	"github.com/yazmeyaa/todo_app_backend/models"
+	"golang.org/x/crypto/bcrypt"
 )
+
+var BCRYPT_COST = 6
 
 type AuthServiceImpl struct {
 	userSerivce UserService
@@ -27,7 +31,10 @@ func (service AuthServiceImpl) Login(creds Credentails) (token string, err error
 		return "", findErr
 	}
 
-	if found.Password != creds.Password {
+	compareError := bcrypt.CompareHashAndPassword([]byte(found.Password), []byte(creds.Password))
+
+	if compareError != nil {
+		log.Default().Println(compareError.Error())
 		return "", errors.New("wrong password")
 	}
 
