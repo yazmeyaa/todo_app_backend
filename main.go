@@ -30,7 +30,7 @@ func main() {
 		Tasks: api.NewTaskController(taskService, validator),
 		Users: api.NewUserController(userService, validator, jwtService),
 		Auth:  api.NewAuthController(authService, validator),
-	}, validator)
+	}, validator, jwtService)
 
 	gin.Run()
 }
