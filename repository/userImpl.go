@@ -21,23 +21,41 @@ func (repository UserRepositoryImpl) Create(user *models.User) error {
 	var existUser models.User
 
 	findQuery := repository.DB.Model(&models.User{})
-	findError := findQuery.Where("username = ? OR email = ?", user.Username, user.Email).Find(&existUser).Error
+	if user.Username == nil && user.Email == nil {
+		return errors.New("username or email required")
+	}
+
+	if user.Email != nil || user.Username != nil {
+		if user.Email != nil {
+			findQuery = findQuery.Where("email = ?", *user.Email)
+			if user.Username != nil {
+				findQuery = findQuery.Or("username = ?", *user.Username)
+			}
+		} else if user.Username != nil {
+			findQuery = findQuery.Where("username = ?", *user.Username)
+			if user.Email != nil {
+				findQuery = findQuery.Or("email = ?", *user.Email)
+			}
+		}
+	}
+
+	findError := findQuery.First(&existUser).Error
+	isExist := true
 
 	// It means user found
-	if !errors.Is(findError, gorm.ErrRecordNotFound) {
-		if *existUser.Email != "" {
-			return errors.New("user with given email already exist")
-		}
-		if *existUser.Username != "" {
-			return errors.New("user with given username already exist")
-		}
+	if errors.Is(findError, gorm.ErrRecordNotFound) {
+		isExist = false
+	}
+
+	if isExist {
+		return errors.New("user with given username or email already exist")
 	}
 
 	newUser := models.User{
 		Name:     user.Name,
-		Email:    user.Email,
 		Username: user.Username,
 		Password: user.Password,
+		Email:    user.Email,
 	}
 	query := repository.DB.Model(&models.User{})
 	query.Create(&newUser)

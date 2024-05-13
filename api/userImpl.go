@@ -43,17 +43,17 @@ func (controller UserControllerImpl) Create(ctx *gin.Context) {
 		return
 	}
 
-	if reqBody.Username == "" && reqBody.Email == "" {
+	if reqBody.Username == "" {
 		ctx.JSON(400, response.ApiErrorResponse{
-			Error: "Email or username is required",
+			Error: "Username is required",
 		})
 		return
 	}
 
 	newUser := models.User{
 		Name:     reqBody.Name,
-		Email:    &reqBody.Email,
 		Username: &reqBody.Username,
+		Email:    &reqBody.Email,
 		Password: reqBody.Password,
 	}
 

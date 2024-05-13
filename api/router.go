@@ -26,6 +26,7 @@ func NewRouter(controllers *RouterControllers, validator *validator.Validate) *g
 
 	authRouter := router.Group("/auth")
 	authRouter.POST("/login", controllers.Auth.Login)
+	authRouter.POST("/register", controllers.Auth.Register)
 
 	return router
 }
