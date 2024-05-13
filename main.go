@@ -10,6 +10,8 @@ import (
 )
 
 func main() {
+	cfg := config.NewAppConfig()
+	jwtService := services.NewJwtService(cfg)
 	validator := validator.New(validator.WithRequiredStructEnabled())
 
 	db := config.GetDBConfig()
@@ -22,9 +24,12 @@ func main() {
 	userRepo := repository.NewUserRepository(db)
 	userService := services.NewUserService(userRepo)
 
+	authService := services.NewAuthService(userService, jwtService)
+
 	gin := api.NewRouter(&api.RouterControllers{
 		Tasks: api.NewTaskController(taskService, validator),
-		Users: api.NewUserController(userService, validator),
+		Users: api.NewUserController(userService, validator, jwtService),
+		Auth:  api.NewAuthController(authService, validator),
 	}, validator)
 
 	gin.Run()

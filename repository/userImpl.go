@@ -24,7 +24,7 @@ func (repository UserRepositoryImpl) Create(user *models.User) error {
 	findError := findQuery.Where("username = ? OR email = ?", user.Username, user.Email).Find(&existUser).Error
 
 	// It means user found
-	if findError == nil {
+	if !errors.Is(findError, gorm.ErrRecordNotFound) {
 		if *existUser.Email != "" {
 			return errors.New("user with given email already exist")
 		}

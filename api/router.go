@@ -8,6 +8,7 @@ import (
 type RouterControllers struct {
 	Tasks TaskController
 	Users UserController
+	Auth  AuthController
 }
 
 func NewRouter(controllers *RouterControllers, validator *validator.Validate) *gin.Engine {
@@ -21,8 +22,10 @@ func NewRouter(controllers *RouterControllers, validator *validator.Validate) *g
 	taskRouter.DELETE("/:id", controllers.Tasks.Delete)
 
 	userRouter := router.Group("/user")
-
 	userRouter.POST("/", controllers.Users.Create)
+
+	authRouter := router.Group("/auth")
+	authRouter.POST("/login", controllers.Auth.Login)
 
 	return router
 }

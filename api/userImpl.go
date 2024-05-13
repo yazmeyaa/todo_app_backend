@@ -12,14 +12,16 @@ import (
 )
 
 type UserControllerImpl struct {
-	Service  services.UserService
-	Validate *validator.Validate
+	Service    services.UserService
+	Validate   *validator.Validate
+	JwtService services.JWTService
 }
 
-func NewUserController(service services.UserService, validate *validator.Validate) UserController {
+func NewUserController(service services.UserService, validate *validator.Validate, jwtService services.JWTService) UserController {
 	return &UserControllerImpl{
-		Service:  service,
-		Validate: validate,
+		Service:    service,
+		Validate:   validate,
+		JwtService: jwtService,
 	}
 }
 
