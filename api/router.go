@@ -30,6 +30,7 @@ func NewRouter(controllers *RouterControllers, validator *validator.Validate, jw
 	authRouter := router.Group("/auth")
 	authRouter.POST("/login", controllers.Auth.Login)
 	authRouter.POST("/register", controllers.Auth.Register)
+	authRouter.POST("/check", middlewares.AuthJWTMiddleware(jwtService), controllers.Auth.CheckToken)
 
 	return router
 }

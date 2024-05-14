@@ -10,5 +10,5 @@ type Credentails struct {
 
 type AuthService interface {
 	Register(user *models.User) error
-	Login(creds Credentails) (token string, err error)
+	Login(creds Credentails) (token string, user *models.User, err error)
 }

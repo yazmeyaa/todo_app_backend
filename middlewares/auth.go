@@ -21,15 +21,16 @@ func AuthJWTMiddleware(jwtService services.JWTService) gin.HandlerFunc {
 		}
 
 		authToken := t[1]
-		valid := jwtService.Verify(authToken)
+		claims, decodeError := jwtService.Decode(authToken)
 
-		if !valid {
+		if decodeError != nil {
 			webResponse := response.NewApiErrorResponse("Not valid token")
 			ctx.JSON(http.StatusUnauthorized, webResponse)
 			ctx.Abort()
 			return
 		}
 
+		ctx.Set("userId", claims.UserId)
 		ctx.Next()
 	}
 }

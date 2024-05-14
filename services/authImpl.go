@@ -25,20 +25,22 @@ func NewAuthService(userService UserService, jwtService JWTService) AuthService 
 func (service AuthServiceImpl) Register(user *models.User) error {
 	return service.userSerivce.Create(user)
 }
-func (service AuthServiceImpl) Login(creds Credentails) (token string, err error) {
+func (service AuthServiceImpl) Login(creds Credentails) (token string, user *models.User, err error) {
 	found, findErr := service.userSerivce.FindByUsername(*creds.Username)
 	if findErr != nil {
-		return "", findErr
+		return "", nil, findErr
 	}
 
 	compareError := bcrypt.CompareHashAndPassword([]byte(found.Password), []byte(creds.Password))
 
 	if compareError != nil {
 		log.Default().Println(compareError.Error())
-		return "", errors.New("wrong password")
+		return "", nil, errors.New("wrong password")
 	}
 
-	return service.jwtService.Sign(UserClaims{
+	token, signError := service.jwtService.Sign(UserClaims{
 		UserId: int(found.ID),
 	})
+
+	return token, found, signError
 }

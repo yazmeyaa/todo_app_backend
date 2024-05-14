@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -22,27 +21,20 @@ type TaskControllerImpl struct {
 func (controller *TaskControllerImpl) GetById(ctx *gin.Context) {
 	idParam, ok := ctx.Params.Get("id")
 	if !ok {
-		ctx.JSON(400, response.ApiErrorResponse{
-			Error: "Missed id param",
-		})
+		ctx.JSON(400, response.NewApiErrorResponse("Missed id param"))
 		return
 	}
 
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		ctx.JSON(400, response.ApiErrorResponse{
-			Error: "Unexprected value in param :id",
-		})
+		ctx.JSON(400, response.NewApiErrorResponse("Unexprected value in param :id"))
 		return
 	}
 
 	task, err := controller.Service.FindById(uint(id))
 
 	if err != nil {
-		fmt.Printf("Err: %s", err.Error())
-		ctx.JSON(400, response.ApiErrorResponse{
-			Error: err.Error(),
-		})
+		ctx.JSON(400, response.NewApiErrorResponse(err.Error()))
 		return
 	}
 	ctx.JSON(201, response.GetByIdResponse{

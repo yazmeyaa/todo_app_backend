@@ -1,8 +1,6 @@
 package api
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/yazmeyaa/todo_app_backend/data/request"
@@ -14,6 +12,19 @@ import (
 type AuthControllerImpl struct {
 	authService services.AuthService
 	validate    *validator.Validate
+}
+
+// CheckToken implements AuthController.
+func (a *AuthControllerImpl) CheckToken(ctx *gin.Context) {
+	// Token check in middleware
+	var userId int
+	userIdCtx := ctx.MustGet("userId")
+
+	userId = userIdCtx.(int)
+
+	ctx.JSON(200, gin.H{
+		"userId": userId,
+	})
 }
 
 // Login implements AuthController.
@@ -38,14 +49,15 @@ func (a *AuthControllerImpl) Login(ctx *gin.Context) {
 		Password: reqBody.Password,
 	}
 
-	token, loginErr := a.authService.Login(creds)
+	token, user, loginErr := a.authService.Login(creds)
 	if loginErr != nil {
 		ctx.JSON(400, response.NewApiErrorResponse("Wrong username or password"))
 		return
 	}
 
-	ctx.Header("auth", fmt.Sprintf("Bearer %s", token))
-	ctx.Status(204)
+	response := response.NewLoginResponse(user, token)
+
+	ctx.JSON(200, response)
 }
 
 // Register implements AuthController.

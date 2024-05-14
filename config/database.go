@@ -2,13 +2,14 @@ package config
 
 import (
 	"fmt"
+	"log"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
 func GetDBConfig() *gorm.DB {
-	fmt.Println("[CONFIG][DATABASE]: Start initiating database")
+	log.Default().Println("[CONFIG][DATABASE]: Start initiating database")
 	const (
 		filename = "database.db"
 	)
@@ -18,6 +19,6 @@ func GetDBConfig() *gorm.DB {
 		panic(fmt.Sprintf("[DATABASE]: Cannot initialize database: %s", err.Error()))
 	}
 
-	fmt.Println("[CONFIG][DATABASE]: Database file initiated")
+	log.Default().Println("[CONFIG][DATABASE]: Database file initiated")
 	return db
 }
